@@ -1,0 +1,590 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #ff3333;
+    --primary-dark: #cc0000;
+    --accent: #ff6600;
+    --dark: #0a0a0a;
+    --darker: #050505;
+    --light: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 25%, #0a0a0a 50%, #001a00 75%, #0a0a0a 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    color: var(--light);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,0,0,0.03)" d="M0,128L48,144C96,160,192,192,288,186.7C384,181,480,139,576,138.7C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+    background-size: cover;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Glass эффект */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+}
+
+/* Навигация */
+.navbar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1200px;
+    z-index: 1000;
+    padding: 15px 30px;
+    animation: slideDown 0.8s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ДОБАВЬ ЭТО */
+.logo-img {
+    width: 50px;           /* Фиксированная ширина */
+    height: 50px;          /* Фиксированная высота */
+    object-fit: contain;   /* Сохраняет пропорции */
+    border-radius: 8px;    /* Скругление (по желанию) */
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.1) rotate(5deg);  /* Прикольная анимация при наведении */
+}
+
+.logo-text {
+    font-size: 1.5em;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff3333, #ff6666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-chapter {
+    font-size: 0.6em;
+    background: linear-gradient(135deg, #ff6600, #ff3333);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-links a:hover {
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+}
+
+/* Hero секция */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 60px;
+    position: relative;
+}
+
+.hero-content {
+    text-align: center;
+    max-width: 900px;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title {
+    font-size: 4.5em;
+    font-weight: 900;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff0000, #ff3333, #ff6600);
+    background-size: 200% 200%;
+    animation: titleGlow 3s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 20px;
+}
+
+@keyframes titleGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.title-small {
+    display: block;
+    font-size: 0.3em;
+    margin-bottom: 10px;
+}
+
+.title-chapter {
+    display: block;
+    font-size: 0.4em;
+    margin-top: 10px;
+}
+
+.subtitle {
+    font-size: 1.3em;
+    font-weight: 300;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    padding: 15px 30px;
+    display: inline-block;
+}
+
+.release-badge {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: 600;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(255, 51, 51, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+}
+
+/* Инфо карточки */
+.game-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.info-card {
+    padding: 40px 30px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.info-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.info-card i {
+    font-size: 3em;
+    color: var(--primary);
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+}
+
+.info-card h3 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+/* Секции */
+.features-section,
+.trailer-section,
+.download-section {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 3em;
+    font-weight: 900;
+    margin-bottom: 50px;
+    padding: 15px 30px;
+    display: inline-block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff3333, #ff6600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Сетка особенностей */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature {
+    padding: 40px 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.feature:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(255, 0, 0, 0.3);
+}
+
+.feature-icon {
+    font-size: 3em;
+    color: var(--accent);
+    margin-bottom: 20px;
+    text-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Трейлер */
+.trailer-container {
+    padding: 40px;
+    text-align: center;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trailer-placeholder {
+    animation: fadeIn 1s ease;
+}
+
+.play-button {
+    font-size: 5em;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulse 2s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+}
+
+.play-button:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+}
+
+.trailer-date {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+/* Секция загрузки */
+.download-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.download-card {
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.download-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+}
+
+.card-header {
+    padding: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.card-header.beta {
+    background: linear-gradient(135deg, rgba(0, 100, 255, 0.2), rgba(0, 50, 200, 0.2));
+}
+
+.card-header.release {
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(200, 0, 0, 0.2));
+}
+
+.card-header h3 {
+    font-size: 2em;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.version {
+    font-size: 1.2em;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.features-list {
+    list-style: none;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.features-list li {
+    padding: 8px 0;
+    color: #ccc;
+}
+
+.features-list i {
+    color: #00ff00;
+    margin-right: 10px;
+}
+
+.download-btn {
+    display: block;
+    width: 100%;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.download-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.download-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.beta-btn {
+    background: linear-gradient(135deg, #0066ff, #0044cc);
+    color: white;
+    animation: glowBlue 2s ease-in-out infinite;
+}
+
+@keyframes glowBlue {
+    0% { box-shadow: 0 0 5px rgba(0, 100, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 100, 255, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(0, 100, 255, 0.5); }
+}
+
+.beta-btn:hover {
+    background: linear-gradient(135deg, #0088ff, #0066ff);
+    transform: scale(1.05);
+}
+
+.release-btn {
+    background: linear-gradient(135deg, #ff3333, #cc0000);
+    color: white;
+    position: relative;
+}
+
+.release-btn:not(.disabled) {
+    animation: glowRed 2s ease-in-out infinite;
+}
+
+@keyframes glowRed {
+    0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+    50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+}
+
+.release-btn.disabled {
+    background: linear-gradient(135deg, #444, #333);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.release-btn:not(.disabled):hover {
+    background: linear-gradient(135deg, #ff5555, #ff0000);
+    transform: scale(1.05);
+}
+
+.file-size {
+    text-align: center;
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+/* Футер */
+.footer {
+    margin: 60px auto 30px;
+    max-width: 1200px;
+    padding: 30px;
+    text-align: center;
+}
+
+.footer-content p {
+    margin: 5px 0;
+    opacity: 0.8;
+}
+
+.social-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-links a {
+    color: var(--light);
+    font-size: 1.5em;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--accent);
+    transform: translateY(-3px);
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+}
+
+/* Частицы */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: particleFloat linear infinite;
+    opacity: 0;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.2;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5em;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .game-info,
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .download-cards {
+        grid-template-columns: 1fr;
+    }
+}
