@@ -20,7 +20,7 @@ function createParticles() {
 
 // Таймер обратного отсчета
 function startCountdown() {
-    const targetDate = new Date('2026-05-09T18:10:00+03:00');
+    const targetDate = new Date('2026-05-15T15:00:00+03:00');
     const countdownElement = document.getElementById('countdown');
     const releaseButton = document.getElementById('releaseDownloadBtn');
 
@@ -65,7 +65,7 @@ document.getElementById('betaDownloadBtn').addEventListener('click', function(e)
 // Обработчик для Release кнопки
 document.getElementById('releaseDownloadBtn').addEventListener('click', function(e) {
     const now = new Date();
-    const targetDate = new Date('2026-05-09T18:10:00+03:00');
+    const targetDate = new Date('2026-05-15T15:00:00+03:00');
 
     if (now >= targetDate && !this.classList.contains('disabled')) {
         // Анимация нажатия
