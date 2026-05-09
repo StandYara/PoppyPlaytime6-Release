@@ -151,7 +151,7 @@ function init() {
 
     console.log('Poppy Playtime 6 - Сайт запущен! 🎮');
     console.log('Релиз: 9 мая 2026 года 17:16');
-    console.log('Осталось дней: ' + Math.ceil((new Date('2026-05-09T17:16:00+03:00') - new Date()) / (1000 * 60 * 60 * 24)));
+    console.log('Осталось дней: ' + Math.ceil((new Date('2026-05-15T15:00:00+03:00') - new Date()) / (1000 * 60 * 60 * 24)));
 }
 
 // Запуск при загрузке
