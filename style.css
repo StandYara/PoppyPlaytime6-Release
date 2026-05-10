@@ -275,10 +275,15 @@ body {
 /* Секции */
 .features-section,
 .trailer-section,
-.download-section {
+.download-section,
+.speedrunners-section {
     padding: 50px 15px;
     max-width: 1200px;
     margin: 0 auto;
+}
+
+.speedrunners-section {
+    text-align: center;
 }
 
 .section-title {
@@ -287,14 +292,18 @@ body {
     font-weight: 900;
     margin-bottom: 40px;
     padding: 12px 25px;
-    display: inline-block;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
     background: linear-gradient(135deg, #ff3333, #ff6600);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+.section-title i {
+    margin-right: 10px;
 }
 
 /* Сетка особенностей */
@@ -344,8 +353,8 @@ body {
 .trailer-container {
     padding: 30px 20px;
     text-align: center;
-    min-height: 300px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
@@ -377,6 +386,342 @@ body {
     font-size: 0.8em;
     opacity: 0.7;
     margin-top: 5px;
+}
+
+/* Обёртка для видео */
+.trailer-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.trailer-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.trailer-note {
+    margin-top: 15px;
+    font-size: 0.85em;
+    opacity: 0.7;
+    text-align: center;
+    color: #aaa;
+}
+
+.trailer-note i {
+    color: var(--accent);
+    margin-right: 5px;
+}
+
+/* ==================== */
+/* БЛОК СПИДРАНЕРОВ     */
+/* ==================== */
+
+.speedrunners-top3 {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.speedrunner-card {
+    padding: 25px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 200px;
+    max-width: 250px;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.speedrunner-card:hover {
+    transform: translateY(-8px);
+}
+
+.speedrunner-card.gold {
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.speedrunner-card.silver {
+    border: 2px solid rgba(192, 192, 192, 0.4);
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.15);
+}
+
+.speedrunner-card.bronze {
+    border: 2px solid rgba(205, 127, 50, 0.4);
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.15);
+}
+
+.rank-badge {
+    font-size: 1.4em;
+    font-weight: 900;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.runner-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.speedrunner-card.gold .runner-avatar {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    width: 90px;
+    height: 90px;
+}
+
+.speedrunner-card.silver .runner-avatar {
+    border-color: rgba(192, 192, 192, 0.5);
+}
+
+.speedrunner-card.bronze .runner-avatar {
+    border-color: rgba(205, 127, 50, 0.5);
+}
+
+.runner-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 5px;
+    background: linear-gradient(135deg, #fff, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.speedrunner-card.gold .runner-name {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.runner-time {
+    font-size: 1.4em;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+    letter-spacing: 1px;
+}
+
+.view-all-container {
+    margin-top: 35px;
+    text-align: center;
+}
+
+.view-all-btn {
+    padding: 14px 35px;
+    font-size: 1.05em;
+    font-weight: 700;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: var(--light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.view-all-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 25px rgba(255, 102, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.view-all-btn i {
+    margin-right: 8px;
+}
+
+/* Модальное окно */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 30px;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.modal-header h2 {
+    font-size: 1.6em;
+    font-weight: 900;
+}
+
+.modal-header h2 i {
+    color: #FFD700;
+    margin-right: 10px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--light);
+    font-size: 2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--primary);
+    transform: rotate(90deg);
+}
+
+/* Табы */
+.modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Список лидеров */
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.leaderboard-row .rank {
+    font-size: 1.2em;
+    font-weight: 900;
+    min-width: 30px;
+    text-align: center;
+}
+
+.leaderboard-row .rank.top1 { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+.leaderboard-row .rank.top2 { color: #C0C0C0; text-shadow: 0 0 10px rgba(192, 192, 192, 0.5); }
+.leaderboard-row .rank.top3 { color: #CD7F32; text-shadow: 0 0 10px rgba(205, 127, 50, 0.5); }
+
+.leaderboard-row .small-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.leaderboard-row .row-name {
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.leaderboard-row .row-time {
+    font-weight: 900;
+    color: var(--accent);
+    font-size: 1.1em;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.4);
 }
 
 /* Секция загрузки */
@@ -550,6 +895,8 @@ body {
     max-width: 1200px;
     padding: 25px 20px;
     text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .footer-content p {
@@ -611,6 +958,200 @@ body {
         transform: translateY(-100vh) scale(1);
         opacity: 0;
     }
+}
+
+/* ==================== */
+/* РАЗДЕЛ ОБНОВЛЕНИЙ   */
+/* ==================== */
+
+.updates-section {
+    padding: 50px 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.updates-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.update-post {
+    padding: 25px;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.update-post:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.post-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.post-username {
+    font-weight: 700;
+    font-size: 0.95em;
+    color: var(--light);
+}
+
+.post-time {
+    font-size: 0.75em;
+    opacity: 0.6;
+    margin-top: 2px;
+}
+
+.post-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.post-badge.bug {
+    background: rgba(255, 50, 50, 0.2);
+    color: #ff5555;
+    border: 1px solid rgba(255, 50, 50, 0.3);
+}
+
+.post-badge.update {
+    background: rgba(0, 150, 255, 0.2);
+    color: #44aaff;
+    border: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.post-badge.change {
+    background: rgba(255, 180, 0, 0.2);
+    color: #ffbb33;
+    border: 1px solid rgba(255, 180, 0, 0.3);
+}
+
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-content p {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #ddd;
+}
+
+.post-image {
+    margin-bottom: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.post-image img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.post-image img:hover {
+    transform: scale(1.02);
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.post-reactions {
+    display: flex;
+    gap: 8px;
+}
+
+.reaction-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #aaa;
+    padding: 8px 14px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.reaction-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: scale(1.05);
+}
+
+.reaction-btn.active {
+    background: rgba(255, 50, 50, 0.2);
+    border-color: rgba(255, 50, 50, 0.4);
+    color: #ff5555;
+    animation: popReaction 0.4s ease;
+}
+
+.reaction-btn.active[data-reaction="fire"] {
+    background: rgba(255, 150, 0, 0.2);
+    border-color: rgba(255, 150, 0, 0.4);
+    color: #ff9922;
+}
+
+.reaction-btn.active[data-reaction="skull"] {
+    background: rgba(200, 200, 200, 0.2);
+    border-color: rgba(200, 200, 200, 0.4);
+    color: #cccccc;
+}
+
+@keyframes popReaction {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+.reaction-count {
+    font-size: 0.9em;
+}
+
+.post-views {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #888;
+    font-size: 0.85em;
+}
+
+.post-views i {
+    font-size: 0.9em;
 }
 
 /* ==================== */
@@ -710,7 +1251,8 @@ body {
 
     .features-section,
     .trailer-section,
-    .download-section {
+    .download-section,
+    .speedrunners-section {
         padding: 40px 10px;
     }
 
@@ -750,6 +1292,25 @@ body {
         font-size: 3em;
     }
 
+    .speedrunners-top3 {
+        gap: 15px;
+    }
+
+    .speedrunner-card {
+        min-width: 150px;
+        padding: 20px 15px;
+    }
+
+    .speedrunner-card.gold .runner-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .runner-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
     .download-cards {
         flex-direction: column;
         align-items: center;
@@ -773,6 +1334,28 @@ body {
     .download-btn {
         padding: 12px 15px;
         font-size: 1em;
+    }
+
+    .modal-content {
+        padding: 20px;
+        max-height: 85vh;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3em;
+    }
+
+    .leaderboard-row {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .leaderboard-row .row-name {
+        font-size: 0.85em;
+    }
+
+    .leaderboard-row .row-time {
+        font-size: 0.95em;
     }
 
     .footer {
@@ -852,6 +1435,16 @@ body {
 
     .play-button {
         font-size: 2.5em;
+    }
+
+    .speedrunners-top3 {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .speedrunner-card {
+        max-width: 280px;
+        width: 100%;
     }
 
     .download-card {
