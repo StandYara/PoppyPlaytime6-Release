@@ -100,6 +100,11 @@
                 <i class="fas fa-list-ol"></i> Смотреть все результаты
             </button>
         </div>
+        <div class="how-to-join-container">
+            <button class="how-to-join-btn glass" id="howToJoinBtn">
+                <i class="fas fa-question-circle"></i> Как сюда попасть?
+            </button>
+        </div>
     </section>
 
     <section class="features-section" id="features">
@@ -198,7 +203,7 @@
         </div>
     </section>
 
-    <!-- 📢 НОВЫЙ РАЗДЕЛ: ОБНОВЛЕНИЯ -->
+    <!-- 📢 РАЗДЕЛ: ОБНОВЛЕНИЯ -->
     <section class="updates-section" id="updates">
         <h2 class="section-title glass"><i class="fas fa-bullhorn"></i> ОБНОВЛЕНИЯ</h2>
         <div class="updates-container">
@@ -217,7 +222,7 @@
                     <p>В скором времени игра будет обновлена и вы сможете попасть в таблицу лидеров!</p>
                 </div>
                 <div class="post-image">
-                    <img src="assets/update-bug.jpg" alt="Баг с дверью" onerror="this.style.display='none'">
+                    <img src="assets/update-bug.jpg" alt="Анонс" onerror="this.style.display='none'">
                 </div>
                 <div class="post-footer">
                     <div class="post-reactions">
@@ -251,7 +256,7 @@
                     <p>Исправили множество багов и ошибок.</p>
                 </div>
                 <div class="post-image">
-                    <img src="assets/update-grabpack.jpg" alt="Новая анимация" onerror="this.style.display='none'">
+                    <img src="assets/update-grabpack.jpg" alt="Исправление" onerror="this.style.display='none'">
                 </div>
                 <div class="post-footer">
                     <div class="post-reactions">
@@ -285,7 +290,7 @@
                     <p>Добавили больше света в игру чтобы игрок смог ходить по карте без фонарика</p>
                 </div>
                 <div class="post-image">
-                    <img src="assets/update-balance.jpg" alt="Баланс" onerror="this.style.display='none'">
+                    <img src="assets/update-balance.jpg" alt="Добавление" onerror="this.style.display='none'">
                 </div>
                 <div class="post-footer">
                     <div class="post-reactions">
@@ -324,6 +329,47 @@
             </div>
             <div class="tab-content" id="tab-monthly">
                 <div class="leaderboard-list" id="leaderboardMonthly"></div>
+            </div>
+            <div class="how-to-join-modal">
+                <button class="how-to-join-btn-modal glass" id="howToJoinBtnModal">
+                    <i class="fas fa-question-circle"></i> Как сюда попасть?
+                </button>
+            </div>
+        </div>
+    </div>
+
+        <!-- 📋 МОДАЛЬНОЕ ОКНО: КАК ПОПАСТЬ -->
+    <div class="modal-overlay" id="howToJoinModal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> Как попасть в таблицу?</h2>
+                <button class="modal-close" id="closeHowToJoinModal">&times;</button>
+            </div>
+            <div class="how-to-content">
+                <div class="step-card glass">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fas fa-gamepad"></i></div>
+                    <h3>Пройдите игру на скорость</h3>
+                    <p>Запустите Poppy Playtime 6 и пройдите её как можно быстрее. Для фиксации времени включите секундомер в настройках.</p>
+                </div>
+                <div class="step-card glass">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fas fa-camera"></i></div>
+                    <h3>Запишите результат</h3>
+                    <p>Сделайте скриншот или запишите видео с финальным временем прохождения.</p>
+                </div>
+                <div class="step-card glass">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fab fa-telegram-plane"></i></div>
+                    <h3>Отправьте заявку</h3>
+                    <p>Отправьте скриншот или видео в нашу поддержку в Telegram: <a href="https://t.me/PoppyPlaytimeSupportBot" target="_blank" class="tg-link">@PoppyPlaytimeSupportBot</a></p>
+                </div>
+                <div class="step-card glass">
+                    <div class="step-number">4</div>
+                    <div class="step-icon"><i class="fas fa-trophy"></i></div>
+                    <h3>Попадите в таблицу</h3>
+                    <p>Лучшие результаты будут добавлены в таблицу лидеров после проверки (~2 часа)!</p>
+                </div>
             </div>
         </div>
     </div>
