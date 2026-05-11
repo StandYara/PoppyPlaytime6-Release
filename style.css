@@ -1610,3 +1610,18 @@ body {
         padding: 15px 10px;
     }
 }
+
+/* Фикс для кнопок на Onreza */
+.how-to-join-btn,
+.how-to-join-btn-modal {
+    position: relative;
+    z-index: 100;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.how-to-join-container,
+.how-to-join-modal {
+    position: relative;
+    z-index: 50;
+}

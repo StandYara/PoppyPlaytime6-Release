@@ -302,6 +302,7 @@ function initUpdates() {
     localStorage.setItem('pp6_post_reactions', JSON.stringify(savedReactions));
 }
 
+// Инициализация всего
 function init() {
     createParticles();
     startCountdown();
@@ -318,13 +319,17 @@ function init() {
     const closeHowToJoinBtn = document.getElementById('closeHowToJoinModal');
 
     function openHowToJoin() {
-        howToJoinModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        if (howToJoinModal) {
+            howToJoinModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function closeHowToJoin() {
-        howToJoinModal.classList.remove('active');
-        document.body.style.overflow = '';
+        if (howToJoinModal) {
+            howToJoinModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 
     if (howToJoinBtn) {
