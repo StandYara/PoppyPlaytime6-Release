@@ -551,6 +551,68 @@ body {
     margin-right: 8px;
 }
 
+/* Кнопка "Как сюда попасть" на главной */
+.how-to-join-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.how-to-join-btn {
+    padding: 12px 30px;
+    font-size: 0.95em;
+    font-weight: 700;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    color: #FFD700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 215, 0, 0.05);
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.how-to-join-btn:hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.how-to-join-btn i {
+    margin-right: 8px;
+}
+
+/* Кнопка в модалке */
+.how-to-join-modal {
+    margin-top: 25px;
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.how-to-join-btn-modal {
+    padding: 12px 30px;
+    font-size: 0.95em;
+    font-weight: 700;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    color: #FFD700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 215, 0, 0.05);
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.how-to-join-btn-modal:hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.how-to-join-btn-modal i {
+    margin-right: 8px;
+}
+
 /* Модальное окно */
 .modal-overlay {
     display: none;
@@ -625,6 +687,71 @@ body {
 .modal-close:hover {
     color: var(--primary);
     transform: rotate(90deg);
+}
+
+/* Модалка "Как попасть" */
+.how-to-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.step-card {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.step-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.step-number {
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.1em;
+    flex-shrink: 0;
+}
+
+.step-icon {
+    font-size: 1.8em;
+    color: var(--accent);
+    flex-shrink: 0;
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.4);
+}
+
+.step-card h3 {
+    font-size: 1em;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.step-card p {
+    font-size: 0.85em;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+.tg-link {
+    color: #44aaff;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.tg-link:hover {
+    color: #66ccff;
+    text-shadow: 0 0 10px rgba(68, 170, 255, 0.5);
 }
 
 /* Табы */

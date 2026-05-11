@@ -1,0 +1,2425 @@
+📁 СТРУКТУРА ПРОЕКТА
+============================================================
+📂 .
+├── dump.py
+├── index.html
+├── script.js
+├── style.css
+├── 📂 assets
+│   ├── poppy-logo.png
+============================================================
+
+
+================================================================================
+📄 ФАЙЛ: .\dump.py
+================================================================================
+
+import os
+from pathlib import Path
+import sys
+
+
+def print_progress(current, total, filename):
+    """Показывает прогресс обработки"""
+    percent = (current / total) * 100
+    bar = '█' * int(percent / 2) + '░' * (50 - int(percent / 2))
+    sys.stdout.write(f'\r⏳ Прогресс: |{bar}| {current}/{total} файлов ({percent:.1f}%) - {filename[:30]}...')
+    sys.stdout.flush()
+
+
+def get_project_structure(startpath='.', exclude_dirs=None, exclude_files=None):
+    """Создает красивое дерево структуры проекта"""
+    if exclude_dirs is None:
+        exclude_dirs = {'.venv', '__pycache__', '.git', 'instance', '.idea', '.vscode', 'venv', 'env', 'node_modules'}
+
+    if exclude_files is None:
+        exclude_files = {'structure.txt', 'project_dump_clean.txt', 'project_dump.txt'}
+
+    structure = []
+    structure.append("📁 СТРУКТУРА ПРОЕКТА")
+    structure.append("=" * 60)
+
+    for root, dirs, files in os.walk(startpath):
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
+
+        level = root.replace(startpath, '').count(os.sep)
+        indent = '│   ' * (level - 1) + '├── ' if level > 0 else ''
+
+        if level == 0:
+            structure.append(f"📂 {os.path.basename(root) or '.'}")
+        else:
+            structure.append(f"{indent}📂 {os.path.basename(root)}")
+
+        subindent = '│   ' * level + '├── '
+        for file in sorted(files):
+            if file in exclude_files:
+                continue
+            if not file.endswith(('.pyc', '.pyo', '.log', '.db')):
+                structure.append(f"{subindent}{file}")
+
+    structure.append("=" * 60)
+    structure.append("")
+    return '\n'.join(structure)
+
+
+def get_all_files():
+    """Собирает список всех файлов для обработки"""
+    allowed_extensions = {
+        '.py', '.js', '.html', '.css', '.txt',
+        '.json', '.md', '.yml', '.yaml', '.ini',
+        '.cfg', '.conf', '.sh', '.bat', '.env'
+    }
+
+    exclude_dirs = {
+        '.venv', '__pycache__', '.git', 'instance',
+        '.idea', '.vscode', 'venv', 'env', 'node_modules',
+        'dist', 'build', 'logs', 'tmp', 'temp'
+    }
+
+    exclude_files = {
+        'structure.txt',
+        'project_dump_clean.txt',
+        'project_dump.txt',
+        'collect_project.py',
+        '.DS_Store',
+        'Thumbs.db',
+        'desktop.ini'
+    }
+
+    exclude_patterns = {
+        '*.pyc', '*.pyo', '*.log', '*.db', '*.sqlite3',
+        '*.bak', '*.swp', '*.swo'
+    }
+
+    files_list = []
+
+    for root, dirs, files in os.walk('.'):
+        dirs[:] = [d for d in dirs if d not in exclude_dirs]
+
+        for file in files:
+            filepath = os.path.join(root, file)
+
+            if file == 'structure.txt':
+                print(f"🚫 Пропускаем: {filepath}")
+                continue
+
+            if file in exclude_files:
+                continue
+
+            ext = os.path.splitext(file)[1].lower()
+
+            if ext not in allowed_extensions:
+                continue
+
+            skip = False
+            for pattern in exclude_patterns:
+                if pattern.startswith('*') and file.endswith(pattern[1:]):
+                    skip = True
+                    break
+            if skip:
+                continue
+
+            files_list.append(filepath)
+
+    return sorted(files_list)
+
+
+def is_file_empty(filepath):
+    """Проверяет, пустой ли файл"""
+    try:
+        return os.path.getsize(filepath) == 0
+    except:
+        return True
+
+
+def read_file_safe(filepath):
+    """Безопасное чтение файла с разными кодировками"""
+    encodings = ['utf-8', 'cp1251', 'latin-1', 'ascii', 'cp866']
+
+    for encoding in encodings:
+        try:
+            with open(filepath, 'r', encoding=encoding) as f:
+                content = f.read()
+                if content.startswith('\ufeff'):
+                    content = content[1:]
+                return content, encoding
+        except UnicodeDecodeError:
+            continue
+        except Exception:
+            continue
+
+    return None, None
+
+
+def collect_files():
+    """Собирает все файлы проекта в один чистый дамп"""
+    print("🚀 Запуск сбора проекта...")
+    print("=" * 60)
+    print("⚠️  Файл structure.txt будет ИСКЛЮЧЕН!")
+    print("=" * 60)
+
+    all_files = get_all_files()
+    total_files = len(all_files)
+    print(f"📊 Найдено {total_files} файлов для обработки")
+    print("=" * 60)
+
+    output = []
+
+    output.append(get_project_structure(exclude_files={'structure.txt', 'project_dump_clean.txt', 'project_dump.txt'}))
+
+    processed = 0
+    empty_files = 0
+    error_files = 0
+    skipped_files = 0
+
+    for i, filepath in enumerate(all_files, 1):
+        filename = os.path.basename(filepath)
+
+        if filename == 'structure.txt':
+            skipped_files += 1
+            continue
+
+        print_progress(i, total_files, filename)
+
+        if is_file_empty(filepath):
+            empty_files += 1
+            continue
+
+        output.append(f"\n{'=' * 80}")
+        output.append(f"📄 ФАЙЛ: {filepath}")
+        output.append(f"{'=' * 80}\n")
+
+        content, encoding = read_file_safe(filepath)
+
+        if content is not None:
+            output.append(content)
+            processed += 1
+        else:
+            output.append(f"[Невозможно прочитать файл]")
+            error_files += 1
+
+    print()
+
+    output.append(f"\n{'=' * 80}")
+    output.append(f"📊 СТАТИСТИКА:")
+    output.append(f"{'=' * 80}")
+    output.append(f"✅ Успешно обработано: {processed} файлов")
+    output.append(f"⏭️ Пропущено (пустые): {empty_files} файлов")
+    output.append(f"🚫 Принудительно исключено: {skipped_files} файлов (structure.txt)")
+    output.append(f"❌ Ошибок чтения: {error_files} файлов")
+    output.append(f"📁 Всего найдено: {total_files} файлов")
+    output.append(f"{'=' * 80}")
+
+    result = '\n'.join(output)
+
+    import re
+    result = re.sub(r'\n{4,}', '\n\n\n', result)
+
+    output_file = 'project_dump_clean.txt'
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(result)
+
+    file_size = os.path.getsize(output_file) / 1024
+
+    print(f"\n{'=' * 60}")
+    print(f"✅ ГОТОВО! Создан файл: {output_file}")
+    print(f"📦 Размер: {file_size:.2f} KB")
+    print(f"📁 Всего строк в дампе: {len(result.splitlines())}")
+    print(f"{'=' * 60}")
+    print(f"💡 Теперь загрузи файл {output_file} в DeepSeek")
+    print(f"🚫 Файл structure.txt БЫЛ ИСКЛЮЧЕН!")
+
+
+if __name__ == '__main__':
+    collect_files()
+
+================================================================================
+📄 ФАЙЛ: .\index.html
+================================================================================
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poppy Playtime 6 | Официальный фан-сайт</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="particles-container" id="particles"></div>
+
+    <nav class="navbar glass">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="assets/poppy-logo.png" alt="Poppy Playtime 6" class="logo-img">
+                <span class="logo-text">POPPY PLAYTIME <span class="logo-chapter">Глава 6</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="#about">Об игре</a>
+                <a href="#speedrunners">Спидранеры</a>
+                <a href="#trailer">Трейлер</a>
+                <a href="#download">Скачать</a>
+                <a href="#updates">Обновления</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="title glass">
+                <span class="title-small">ДОЛГОЖДАННОЕ ПРОДОЛЖЕНИЕ</span>
+                POPPY PLAYTIME
+                <span class="title-chapter">ГЛАВА 6: Секреты прототипа</span>
+            </h1>
+            <p class="subtitle glass">
+                Кошмар возвращается. Доберитесь до доктора чтобы узнать секреты Прототипа на фабрике игрушек Playtime Co.
+            </p>
+            <div class="release-badge glass">
+                <i class="fas fa-calendar-alt"></i> Релиз: 15 мая 2026 года
+            </div>
+        </div>
+    </section>
+
+    <section class="game-info" id="about">
+        <div class="info-card glass">
+            <i class="fas fa-skull"></i>
+            <h3>Новый уровень ужаса</h3>
+            <p>Встретьтесь лицом к лицу с доктором и знакомыми кошмарами в самой страшной главе.</p>
+        </div>
+        <div class="info-card glass">
+            <i class="fas fa-puzzle-piece"></i>
+            <h3>Уникальные головоломки</h3>
+            <p>Используйте инновационные инструменты и механизмы для решения смертельных загадок.</p>
+        </div>
+        <div class="info-card glass">
+            <i class="fas fa-map-marked-alt"></i>
+            <h3>Огромный мир</h3>
+            <p>Исследуйте новые территории заброшенной фабрики, каждая комната скрывает свою историю.</p>
+        </div>
+    </section>
+
+    <!-- 🏆 ТОП-3 СПИДРАНЕРА -->
+    <section class="speedrunners-section" id="speedrunners">
+        <h2 class="section-title glass"><i class="fas fa-trophy"></i> ЛУЧШИЕ СПИДРАНЕРЫ</h2>
+        <div class="speedrunners-top3">
+            <!-- 2 место -->
+            <div class="speedrunner-card glass silver">
+                <div class="rank-badge">🥈 2</div>
+                <img src="assets/avatar2.png" alt="Nightmare" class="runner-avatar" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23fff%22 font-size=%2240%22>👤</text></svg>'">
+                <div class="runner-info">
+                    <h3 class="runner-name">---</h3>
+                    <p class="runner-time">--:--:--</p>
+                </div>
+            </div>
+            <!-- 1 место -->
+            <div class="speedrunner-card glass gold">
+                <div class="rank-badge">👑 1</div>
+                <img src="assets/avatar1.png" alt="SpeedDemon" class="runner-avatar" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23fff%22 font-size=%2240%22>👤</text></svg>'">
+                <div class="runner-info">
+                    <h3 class="runner-name">---</h3>
+                    <p class="runner-time">--:--:--</p>
+                </div>
+            </div>
+            <!-- 3 место -->
+            <div class="speedrunner-card glass bronze">
+                <div class="rank-badge">🥉 3</div>
+                <img src="assets/avatar3.png" alt="GhostRunner" class="runner-avatar" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23fff%22 font-size=%2240%22>👤</text></svg>'">
+                <div class="runner-info">
+                    <h3 class="runner-name">---</h3>
+                    <p class="runner-time">--:--:--</p>
+                </div>
+            </div>
+        </div>
+        <div class="view-all-container">
+            <button class="view-all-btn glass" id="viewAllBtn">
+                <i class="fas fa-list-ol"></i> Смотреть все результаты
+            </button>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <h2 class="section-title glass">ОСОБЕННОСТИ ИГРЫ</h2>
+        <div class="features-grid">
+            <div class="feature glass">
+                <div class="feature-icon">
+                    <i class="fas fa-ghost"></i>
+                </div>
+                <h3>Новые антагонисты</h3>
+                <p>Встретьтесь с Доктором и ужасающими созданиями</p>
+            </div>
+            <div class="feature glass">
+                <div class="feature-icon">
+                    <i class="fas fa-hands"></i>
+                </div>
+                <h3>Граб-Пак 3.0</h3>
+                <p>Усовершенствованный инструмент с новыми способностями</p>
+            </div>
+            <div class="feature glass">
+                <div class="feature-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Глубокий сюжет</h3>
+                <p>Узнайте всю правду о трагедии на фабрике</p>
+            </div>
+            <div class="feature glass">
+                <div class="feature-icon">
+                    <i class="fas fa-headphones"></i>
+                </div>
+                <h3>Атмосферный звук</h3>
+                <p>Полное погружение благодаря 3D-аудио</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="trailer-section" id="trailer">
+        <h2 class="section-title glass">ТРЕЙЛЕР</h2>
+        <div class="trailer-container glass">
+            <div class="trailer-wrapper">
+                <iframe
+                    width="720"
+                    height="405"
+                    src="https://rutube.ru/play/embed/9da49bd7b5f41011a3b729bdb9e2dd47/"
+                    style="border: none;"
+                    allow="clipboard-write; autoplay"
+                    allowFullScreen>
+                </iframe>
+            </div>
+            <div class="trailer-note">
+                <i class="fas fa-info-circle"></i> 15 мая вместо тизер-трейлера появится геймплей
+            </div>
+        </div>
+    </section>
+
+    <section class="download-section" id="download">
+        <h2 class="section-title glass">СКАЧАТЬ</h2>
+        <div class="download-cards">
+            <div class="download-card glass">
+                <div class="card-header beta">
+                    <h3>BETA ВЕРСИЯ</h3>
+                    <span class="version">v0.8.5</span>
+                </div>
+                <div class="card-body">
+                    <p>Попробуйте beta-версию игры прямо сейчас!</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Неполная игра</li>
+                        <li><i class="fas fa-check"></i> Небольшая несостыковка с историей</li>
+                        <li><i class="fas fa-check"></i> Возможны баги</li>
+                    </ul>
+                    <a href="#" class="download-btn beta-btn" id="betaDownloadBtn">
+                        <i class="fas fa-download"></i> Скачать Beta
+                    </a>
+                    <p class="file-size">Размер: ~1.6 GB</p>
+                </div>
+            </div>
+
+            <div class="download-card glass release-card">
+                <div class="card-header release">
+                    <h3>ПОЛНАЯ ВЕРСИЯ</h3>
+                    <span class="version">v1.0.0</span>
+                </div>
+                <div class="card-body">
+                    <p>Полное издание игры - весь сюжет, все секреты!</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Полная игра</li>
+                        <li><i class="fas fa-check"></i> Соответствует истории</li>
+                        <li><i class="fas fa-check"></i> Все найденные баги будут исправлены по мере их нахождения</li>
+                    </ul>
+                    <button class="download-btn release-btn disabled" id="releaseDownloadBtn" disabled>
+                        <i class="fas fa-clock"></i> <span id="countdown">Загрузка...</span>
+                    </button>
+                    <p class="file-size">Релиз: 15 мая 2026, 15:00 МСК</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 📢 НОВЫЙ РАЗДЕЛ: ОБНОВЛЕНИЯ -->
+    <section class="updates-section" id="updates">
+        <h2 class="section-title glass"><i class="fas fa-bullhorn"></i> ОБНОВЛЕНИЯ</h2>
+        <div class="updates-container">
+
+            <!-- Пост 1 -->
+            <div class="update-post glass">
+                <div class="post-header">
+                    <img src="assets/poppy-logo.png" alt="StandYara" class="post-avatar" onerror="this.style.display='none'">
+                    <div class="post-user-info">
+                        <span class="post-username">StandYara</span>
+                        <span class="post-time">10.05.2026</span>
+                    </div>
+                    <span class="post-badge bug">📢 Анонс</span>
+                </div>
+                <div class="post-content">
+                    <p>В скором времени игра будет обновлена и вы сможете попасть в таблицу лидеров!</p>
+                </div>
+                <div class="post-image">
+                    <img src="assets/update-bug.jpg" alt="Баг с дверью" onerror="this.style.display='none'">
+                </div>
+                <div class="post-footer">
+                    <div class="post-reactions">
+                        <button class="reaction-btn" data-post="1" data-reaction="like">
+                            <i class="far fa-heart"></i> <span class="reaction-count">0</span>
+                        </button>
+                        <button class="reaction-btn" data-post="1" data-reaction="fire">
+                            <i class="fas fa-fire"></i> <span class="reaction-count">0</span>
+                        </button>
+                        <button class="reaction-btn" data-post="1" data-reaction="skull">
+                            <i class="fas fa-skull"></i> <span class="reaction-count">0</span>
+                        </button>
+                    </div>
+                    <div class="post-views">
+                        <i class="fas fa-eye"></i> <span class="views-count" data-post="1">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Пост 2 -->
+            <div class="update-post glass">
+                <div class="post-header">
+                    <img src="assets/poppy-logo.png" alt="StandYara" class="post-avatar" onerror="this.style.display='none'">
+                    <div class="post-user-info">
+                        <span class="post-username">StandYara</span>
+                        <span class="post-time">20.04.2026</span>
+                    </div>
+                    <span class="post-badge update">🔧 Исправление</span>
+                </div>
+                <div class="post-content">
+                    <p>Исправили множество багов и ошибок.</p>
+                </div>
+                <div class="post-image">
+                    <img src="assets/update-grabpack.jpg" alt="Новая анимация" onerror="this.style.display='none'">
+                </div>
+                <div class="post-footer">
+                    <div class="post-reactions">
+                        <button class="reaction-btn" data-post="2" data-reaction="like">
+                            <i class="far fa-heart"></i> <span class="reaction-count">0</span>
+                        </button>
+                        <button class="reaction-btn" data-post="2" data-reaction="fire">
+                            <i class="fas fa-fire"></i> <span class="reaction-count">0</span>
+                        </button>
+                        <button class="reaction-btn" data-post="2" data-reaction="skull">
+                            <i class="fas fa-skull"></i> <span class="reaction-count">0</span>
+                        </button>
+                    </div>
+                    <div class="post-views">
+                        <i class="fas fa-eye"></i> <span class="views-count" data-post="2">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Пост 3 -->
+            <div class="update-post glass">
+                <div class="post-header">
+                    <img src="assets/poppy-logo.png" alt="StandYara" class="post-avatar" onerror="this.style.display='none'">
+                    <div class="post-user-info">
+                        <span class="post-username">StandYara</span>
+                        <span class="post-time">15.04.2026</span>
+                    </div>
+                    <span class="post-badge change">🔧 Добавление</span>
+                </div>
+                <div class="post-content">
+                    <p>Добавили больше света в игру чтобы игрок смог ходить по карте без фонарика</p>
+                </div>
+                <div class="post-image">
+                    <img src="assets/update-balance.jpg" alt="Баланс" onerror="this.style.display='none'">
+                </div>
+                <div class="post-footer">
+                    <div class="post-reactions">
+                        <button class="reaction-btn" data-post="3" data-reaction="like">
+                            <i class="far fa-heart"></i> <span class="reaction-count">0</span>
+                        </button>
+                        <button class="reaction-btn" data-post="3" data-reaction="fire">
+                            <i class="fas fa-fire"></i> <span class="reaction-count">0</span>
+                        </button>
+                        <button class="reaction-btn" data-post="3" data-reaction="skull">
+                            <i class="fas fa-skull"></i> <span class="reaction-count">0</span>
+                        </button>
+                    </div>
+                    <div class="post-views">
+                        <i class="fas fa-eye"></i> <span class="views-count" data-post="3">0</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 🏆 МОДАЛЬНОЕ ОКНО: ТОП-10 -->
+    <div class="modal-overlay" id="leaderboardModal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2><i class="fas fa-trophy"></i> ТОП-10 СПИДРАНЕРОВ</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="alltime">За всё время</button>
+                <button class="tab-btn" data-tab="monthly">За последний месяц</button>
+            </div>
+            <div class="tab-content active" id="tab-alltime">
+                <div class="leaderboard-list" id="leaderboardAllTime"></div>
+            </div>
+            <div class="tab-content" id="tab-monthly">
+                <div class="leaderboard-list" id="leaderboardMonthly"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer glass">
+        <div class="footer-content">
+            <p>© 2026 Fan-Made Poppy Playtime 6 Project. Это фанатский проект.</p>
+            <p>Poppy Playtime является торговой маркой MOB Games.</p>
+            <div class="social-links">
+                <a href="https://t.me/StandYara" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+                <a href="https://www.tiktok.com/@m0b.entertaiment" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.youtube.com/@StandYaraGame" target="_blank"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+================================================================================
+📄 ФАЙЛ: .\script.js
+================================================================================
+
+// Частицы на фоне
+function createParticles() {
+    const container = document.getElementById('particles');
+    const particleCount = 50;
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+
+        const size = Math.random() * 3 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = Math.random() * 10 + 15 + 's';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+
+        container.appendChild(particle);
+    }
+}
+
+// Таймер обратного отсчета
+function startCountdown() {
+    const targetDate = new Date('2026-05-15T15:00:00+03:00');
+    const countdownElement = document.getElementById('countdown');
+    const releaseButton = document.getElementById('releaseDownloadBtn');
+
+    function updateCountdown() {
+        const now = new Date();
+        const difference = targetDate - now;
+
+        if (difference <= 0) {
+            countdownElement.innerHTML = 'Скачать';
+            releaseButton.classList.remove('disabled');
+            releaseButton.disabled = false;
+            releaseButton.innerHTML = '<i class="fas fa-download"></i> Скачать';
+            return;
+        }
+
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        countdownElement.innerHTML = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
+// Обработчик для Beta кнопки
+document.getElementById('betaDownloadBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+
+    // Анимация нажатия
+    this.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        this.style.transform = 'scale(1)';
+    }, 150);
+
+    // Открываем Гугл Диск в новой вкладке
+    window.open('https://drive.google.com/uc?export=download&id=1QtW6YA87tpGCN_SJIbT4TSkyWFOWzLUd', '_blank');
+});
+
+// Обработчик для Release кнопки
+document.getElementById('releaseDownloadBtn').addEventListener('click', function(e) {
+    const now = new Date();
+    const targetDate = new Date('2026-05-15T15:00:00+03:00');
+
+    if (now >= targetDate && !this.classList.contains('disabled')) {
+        // Анимация нажатия
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = 'scale(1)';
+        }, 150);
+
+        // Открываем Гугл Диск в новой вкладке
+        window.open('https://drive.google.com/uc?export=download&id=124KhXFwUKZcrcl2amGusdMlp1yNrCdam', '_blank');
+    }
+});
+
+// Плавный скролл для навигации
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Анимация появления элементов при скролле
+function animateOnScroll() {
+    const elements = document.querySelectorAll('.info-card, .feature, .download-card');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    elements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'all 0.6s ease';
+        observer.observe(element);
+    });
+}
+
+// Эффект параллакса для hero секции
+function parallaxEffect() {
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero-content');
+        if (hero) {
+            hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+        }
+    });
+}
+
+// Изменение навбара при скролле
+function handleNavbarScroll() {
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.style.background = 'rgba(0, 0, 0, 0.8)';
+            navbar.style.backdropFilter = 'blur(30px)';
+        } else {
+            navbar.style.background = 'rgba(255, 255, 255, 0.05)';
+            navbar.style.backdropFilter = 'blur(20px)';
+        }
+    });
+}
+
+// ====================
+// МОДАЛЬНОЕ ОКНО ТОП-10
+// ====================
+
+// Данные спидранеров
+const allTimeData = [
+    { rank: 1, name: 'SpeedDemon', time: '12:34', avatar: 'assets/avatar1.png' },
+    { rank: 2, name: 'Nightmare', time: '15:21', avatar: 'assets/avatar2.png' },
+    { rank: 3, name: 'GhostRunner', time: '18:07', avatar: 'assets/avatar3.png' },
+    { rank: 4, name: 'ShadowFox', time: '19:45', avatar: '' },
+    { rank: 5, name: 'TurboCat', time: '21:12', avatar: '' },
+    { rank: 6, name: 'PhantomX', time: '22:30', avatar: '' },
+    { rank: 7, name: 'DarkWolf', time: '24:08', avatar: '' },
+    { rank: 8, name: 'StormRider', time: '25:55', avatar: '' },
+    { rank: 9, name: 'BlazeFire', time: '27:40', avatar: '' },
+    { rank: 10, name: 'IceQueen', time: '29:18', avatar: '' },
+];
+
+const monthlyData = [
+    { rank: 1, name: 'TurboCat', time: '14:20', avatar: '' },
+    { rank: 2, name: 'SpeedDemon', time: '15:10', avatar: 'assets/avatar1.png' },
+    { rank: 3, name: 'ShadowFox', time: '17:33', avatar: '' },
+    { rank: 4, name: 'Nightmare', time: '18:45', avatar: 'assets/avatar2.png' },
+    { rank: 5, name: 'BlazeFire', time: '20:10', avatar: '' },
+    { rank: 6, name: 'StormRider', time: '21:55', avatar: '' },
+    { rank: 7, name: 'PhantomX', time: '23:22', avatar: '' },
+    { rank: 8, name: 'GhostRunner', time: '24:50', avatar: 'assets/avatar3.png' },
+    { rank: 9, name: 'IceQueen', time: '26:15', avatar: '' },
+    { rank: 10, name: 'DarkWolf', time: '28:00', avatar: '' },
+];
+
+function getRankClass(rank) {
+    if (rank === 1) return 'top1';
+    if (rank === 2) return 'top2';
+    if (rank === 3) return 'top3';
+    return '';
+}
+
+function getDefaultAvatar() {
+    return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23333" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%23fff" font-size="40">👤</text></svg>');
+}
+
+function renderLeaderboard(data, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = data.map(r => `
+        <div class="leaderboard-row">
+            <span class="rank ${getRankClass(r.rank)}">#${r.rank}</span>
+            <img src="${r.avatar || getDefaultAvatar()}" alt="${r.name}" class="small-avatar" onerror="this.src='${getDefaultAvatar()}'">
+            <span class="row-name">${r.name}</span>
+            <span class="row-time">${r.time}</span>
+        </div>
+    `).join('');
+}
+
+function initLeaderboard() {
+    renderLeaderboard(allTimeData, 'leaderboardAllTime');
+    renderLeaderboard(monthlyData, 'leaderboardMonthly');
+
+    const modal = document.getElementById('leaderboardModal');
+    const viewAllBtn = document.getElementById('viewAllBtn');
+    const closeBtn = document.getElementById('closeModal');
+    const tabs = document.querySelectorAll('.tab-btn');
+
+    if (!modal || !viewAllBtn || !closeBtn) return;
+
+    viewAllBtn.addEventListener('click', () => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const targetTab = document.getElementById(`tab-${tab.dataset.tab}`);
+            if (targetTab) targetTab.classList.add('active');
+        });
+    });
+}
+
+// ====================
+// РАЗДЕЛ ОБНОВЛЕНИЙ (Реакции + Просмотры)
+// ====================
+
+function initUpdates() {
+    // Загрузка сохранённых данных
+    const savedReactions = JSON.parse(localStorage.getItem('pp6_post_reactions') || '{}');
+    const savedViews = JSON.parse(localStorage.getItem('pp6_post_views') || '{}');
+
+    // Инициализация просмотров
+    document.querySelectorAll('.views-count').forEach(el => {
+        const postId = el.dataset.post;
+        if (!savedViews[postId]) {
+            savedViews[postId] = Math.floor(Math.random() * 150) + 10;
+        }
+        // Увеличиваем просмотр при загрузке
+        savedViews[postId] = (savedViews[postId] || 0) + 1;
+        el.textContent = savedViews[postId];
+    });
+    localStorage.setItem('pp6_post_views', JSON.stringify(savedViews));
+
+    // Восстановление реакций
+    document.querySelectorAll('.reaction-btn').forEach(btn => {
+        const postId = btn.dataset.post;
+        const reaction = btn.dataset.reaction;
+        const countSpan = btn.querySelector('.reaction-count');
+
+        // Устанавливаем начальное значение
+        if (!savedReactions[postId]) savedReactions[postId] = {};
+        if (!savedReactions[postId][reaction]) {
+            savedReactions[postId][reaction] = { count: Math.floor(Math.random() * 30) + 1, active: false };
+        }
+        countSpan.textContent = savedReactions[postId][reaction].count;
+
+        if (savedReactions[postId][reaction].active) {
+            btn.classList.add('active');
+        }
+
+        // Обработчик клика
+        btn.addEventListener('click', () => {
+            const currentCount = savedReactions[postId][reaction].count;
+            const isActive = savedReactions[postId][reaction].active;
+
+            if (isActive) {
+                // Убрать реакцию
+                savedReactions[postId][reaction].count = Math.max(0, currentCount - 1);
+                savedReactions[postId][reaction].active = false;
+                btn.classList.remove('active');
+            } else {
+                // Добавить реакцию
+                savedReactions[postId][reaction].count = currentCount + 1;
+                savedReactions[postId][reaction].active = true;
+                btn.classList.add('active');
+                // Анимация
+                btn.style.animation = 'none';
+                btn.offsetHeight;
+                btn.style.animation = 'popReaction 0.4s ease';
+            }
+
+            countSpan.textContent = savedReactions[postId][reaction].count;
+            localStorage.setItem('pp6_post_reactions', JSON.stringify(savedReactions));
+        });
+    });
+
+    localStorage.setItem('pp6_post_reactions', JSON.stringify(savedReactions));
+}
+
+// Инициализация всего
+function init() {
+    createParticles();
+    startCountdown();
+    animateOnScroll();
+    parallaxEffect();
+    handleNavbarScroll();
+    initLeaderboard();
+    initUpdates();
+
+    console.log('Poppy Playtime 6 - Сайт запущен! 🎮');
+    console.log('Релиз: 15 мая 2026 года');
+    console.log('Осталось дней: ' + Math.ceil((new Date('2026-05-15T15:00:00+03:00') - new Date()) / (1000 * 60 * 60 * 24)));
+}
+
+// Запуск при загрузке
+document.addEventListener('DOMContentLoaded', init);
+
+// Добавляем эффект при наведении на карточки
+document.querySelectorAll('.download-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        card.style.transform = `perspective(1000px) rotateX(${(y - rect.height/2) / 20}deg) rotateY(${-(x - rect.width/2) / 20}deg) translateY(-10px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+});
+
+================================================================================
+📄 ФАЙЛ: .\style.css
+================================================================================
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #ff3333;
+    --primary-dark: #cc0000;
+    --accent: #ff6600;
+    --dark: #0a0a0a;
+    --darker: #050505;
+    --light: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 25%, #0a0a0a 50%, #001a00 75%, #0a0a0a 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    color: var(--light);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,0,0,0.03)" d="M0,128L48,144C96,160,192,192,288,186.7C384,181,480,139,576,138.7C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+    background-size: cover;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Glass эффект */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+}
+
+/* Навигация */
+.navbar {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 1200px;
+    z-index: 1000;
+    padding: 12px 20px;
+    animation: slideDown 0.8s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.logo-img {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+    border-radius: 6px;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.logo-text {
+    font-size: 1.1em;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ff3333, #ff6666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+}
+
+.logo-chapter {
+    font-size: 0.55em;
+    background: linear-gradient(135deg, #ff6600, #ff3333);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+    position: relative;
+    white-space: nowrap;
+}
+
+.nav-links a:hover {
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+}
+
+/* Hero секция */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 15px 40px;
+    position: relative;
+}
+
+.hero-content {
+    text-align: center;
+    max-width: 900px;
+    animation: fadeInUp 1s ease-out;
+    width: 100%;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title {
+    font-size: clamp(2em, 6vw, 4.5em);
+    font-weight: 900;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff0000, #ff3333, #ff6600);
+    background-size: 200% 200%;
+    animation: titleGlow 3s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 15px;
+    line-height: 1.2;
+}
+
+@keyframes titleGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.title-small {
+    display: block;
+    font-size: 0.3em;
+    margin-bottom: 10px;
+}
+
+.title-chapter {
+    display: block;
+    font-size: 0.4em;
+    margin-top: 10px;
+}
+
+.subtitle {
+    font-size: clamp(0.9em, 2vw, 1.3em);
+    font-weight: 300;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    padding: 12px 20px;
+    display: inline-block;
+    max-width: 90%;
+}
+
+.release-badge {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: clamp(0.85em, 1.5vw, 1.2em);
+    font-weight: 600;
+    animation: pulse 2s ease-in-out infinite;
+    max-width: 90%;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(255, 51, 51, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+}
+
+/* Инфо карточки */
+.game-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 40px 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.info-card {
+    padding: 30px 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.info-card i {
+    font-size: 2.5em;
+    color: var(--primary);
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+}
+
+.info-card h3 {
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.info-card p {
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* Секции */
+.features-section,
+.trailer-section,
+.download-section,
+.speedrunners-section {
+    padding: 50px 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.speedrunners-section {
+    text-align: center;
+}
+
+.section-title {
+    text-align: center;
+    font-size: clamp(1.8em, 4vw, 3em);
+    font-weight: 900;
+    margin-bottom: 40px;
+    padding: 12px 25px;
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    background: linear-gradient(135deg, #ff3333, #ff6600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-title i {
+    margin-right: 10px;
+}
+
+/* Сетка особенностей */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.feature {
+    padding: 30px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.feature:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(255, 0, 0, 0.3);
+}
+
+.feature-icon {
+    font-size: 2.5em;
+    color: var(--accent);
+    margin-bottom: 15px;
+    text-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+    animation: float 3s ease-in-out infinite;
+}
+
+.feature h3 {
+    font-size: 1.2em;
+    margin-bottom: 8px;
+}
+
+.feature p {
+    font-size: 0.85em;
+    line-height: 1.5;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Трейлер */
+.trailer-container {
+    padding: 30px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.trailer-placeholder {
+    animation: fadeIn 1s ease;
+}
+
+.play-button {
+    font-size: 4em;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: pulse 2s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+}
+
+.play-button:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+}
+
+.trailer-placeholder p {
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.trailer-date {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+/* Обёртка для видео */
+.trailer-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.trailer-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.trailer-note {
+    margin-top: 15px;
+    font-size: 0.85em;
+    opacity: 0.7;
+    text-align: center;
+    color: #aaa;
+}
+
+.trailer-note i {
+    color: var(--accent);
+    margin-right: 5px;
+}
+
+/* ==================== */
+/* БЛОК СПИДРАНЕРОВ     */
+/* ==================== */
+
+.speedrunners-top3 {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.speedrunner-card {
+    padding: 25px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 200px;
+    max-width: 250px;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.speedrunner-card:hover {
+    transform: translateY(-8px);
+}
+
+.speedrunner-card.gold {
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.speedrunner-card.silver {
+    border: 2px solid rgba(192, 192, 192, 0.4);
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.15);
+}
+
+.speedrunner-card.bronze {
+    border: 2px solid rgba(205, 127, 50, 0.4);
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.15);
+}
+
+.rank-badge {
+    font-size: 1.4em;
+    font-weight: 900;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.runner-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.speedrunner-card.gold .runner-avatar {
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    width: 90px;
+    height: 90px;
+}
+
+.speedrunner-card.silver .runner-avatar {
+    border-color: rgba(192, 192, 192, 0.5);
+}
+
+.speedrunner-card.bronze .runner-avatar {
+    border-color: rgba(205, 127, 50, 0.5);
+}
+
+.runner-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 5px;
+    background: linear-gradient(135deg, #fff, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.speedrunner-card.gold .runner-name {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.runner-time {
+    font-size: 1.4em;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+    letter-spacing: 1px;
+}
+
+.view-all-container {
+    margin-top: 35px;
+    text-align: center;
+}
+
+.view-all-btn {
+    padding: 14px 35px;
+    font-size: 1.05em;
+    font-weight: 700;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: var(--light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.view-all-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 25px rgba(255, 102, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.view-all-btn i {
+    margin-right: 8px;
+}
+
+/* Модальное окно */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 30px;
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.modal-header h2 {
+    font-size: 1.6em;
+    font-weight: 900;
+}
+
+.modal-header h2 i {
+    color: #FFD700;
+    margin-right: 10px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--light);
+    font-size: 2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--primary);
+    transform: rotate(90deg);
+}
+
+/* Табы */
+.modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Список лидеров */
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.leaderboard-row .rank {
+    font-size: 1.2em;
+    font-weight: 900;
+    min-width: 30px;
+    text-align: center;
+}
+
+.leaderboard-row .rank.top1 { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+.leaderboard-row .rank.top2 { color: #C0C0C0; text-shadow: 0 0 10px rgba(192, 192, 192, 0.5); }
+.leaderboard-row .rank.top3 { color: #CD7F32; text-shadow: 0 0 10px rgba(205, 127, 50, 0.5); }
+
+.leaderboard-row .small-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.leaderboard-row .row-name {
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.leaderboard-row .row-time {
+    font-weight: 900;
+    color: var(--accent);
+    font-size: 1.1em;
+    text-shadow: 0 0 10px rgba(255, 102, 0, 0.4);
+}
+
+/* Секция загрузки */
+.download-cards {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.download-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 450px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.download-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+}
+
+.card-header {
+    padding: 25px 20px;
+    text-align: center;
+    position: relative;
+}
+
+.card-header.beta {
+    background: linear-gradient(135deg, rgba(0, 100, 255, 0.2), rgba(0, 50, 200, 0.2));
+}
+
+.card-header.release {
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(200, 0, 0, 0.2));
+}
+
+.card-header h3 {
+    font-size: 1.6em;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.version {
+    font-size: 1em;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.card-body {
+    padding: 25px 20px;
+}
+
+.card-body > p {
+    font-size: 0.95em;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.features-list {
+    list-style: none;
+    margin: 15px 0;
+    text-align: left;
+}
+
+.features-list li {
+    padding: 6px 0;
+    color: #ccc;
+    font-size: 0.9em;
+}
+
+.features-list i {
+    color: #00ff00;
+    margin-right: 8px;
+}
+
+.download-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 1.1em;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    margin: 15px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.download-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.download-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.beta-btn {
+    background: linear-gradient(135deg, #0066ff, #0044cc);
+    color: white;
+    animation: glowBlue 2s ease-in-out infinite;
+}
+
+@keyframes glowBlue {
+    0% { box-shadow: 0 0 5px rgba(0, 100, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 100, 255, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(0, 100, 255, 0.5); }
+}
+
+.beta-btn:hover {
+    background: linear-gradient(135deg, #0088ff, #0066ff);
+    transform: scale(1.03);
+}
+
+.release-btn {
+    background: linear-gradient(135deg, #ff3333, #cc0000);
+    color: white;
+    position: relative;
+}
+
+.release-btn:not(.disabled) {
+    animation: glowRed 2s ease-in-out infinite;
+}
+
+@keyframes glowRed {
+    0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+    50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+}
+
+.release-btn.disabled {
+    background: linear-gradient(135deg, #444, #333);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.release-btn:not(.disabled):hover {
+    background: linear-gradient(135deg, #ff5555, #ff0000);
+    transform: scale(1.03);
+}
+
+.file-size {
+    text-align: center;
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-top: 8px;
+}
+
+/* Футер */
+.footer {
+    margin: 40px 15px 20px;
+    max-width: 1200px;
+    padding: 25px 20px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer-content p {
+    margin: 5px 0;
+    opacity: 0.8;
+    font-size: 0.85em;
+}
+
+.social-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-links a {
+    color: var(--light);
+    font-size: 1.3em;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--accent);
+    transform: translateY(-3px);
+    text-shadow: 0 0 15px rgba(255, 102, 0, 0.5);
+}
+
+/* Частицы */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.particle {
+    position: absolute;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: particleFloat linear infinite;
+    opacity: 0;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.2;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ==================== */
+/* РАЗДЕЛ ОБНОВЛЕНИЙ   */
+/* ==================== */
+
+.updates-section {
+    padding: 50px 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.updates-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.update-post {
+    padding: 25px;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.update-post:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.post-user-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.post-username {
+    font-weight: 700;
+    font-size: 0.95em;
+    color: var(--light);
+}
+
+.post-time {
+    font-size: 0.75em;
+    opacity: 0.6;
+    margin-top: 2px;
+}
+
+.post-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.post-badge.bug {
+    background: rgba(255, 50, 50, 0.2);
+    color: #ff5555;
+    border: 1px solid rgba(255, 50, 50, 0.3);
+}
+
+.post-badge.update {
+    background: rgba(0, 150, 255, 0.2);
+    color: #44aaff;
+    border: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.post-badge.change {
+    background: rgba(255, 180, 0, 0.2);
+    color: #ffbb33;
+    border: 1px solid rgba(255, 180, 0, 0.3);
+}
+
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-content p {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #ddd;
+}
+
+.post-image {
+    margin-bottom: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.post-image img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.post-image img:hover {
+    transform: scale(1.02);
+}
+
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.post-reactions {
+    display: flex;
+    gap: 8px;
+}
+
+.reaction-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #aaa;
+    padding: 8px 14px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.reaction-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: scale(1.05);
+}
+
+.reaction-btn.active {
+    background: rgba(255, 50, 50, 0.2);
+    border-color: rgba(255, 50, 50, 0.4);
+    color: #ff5555;
+    animation: popReaction 0.4s ease;
+}
+
+.reaction-btn.active[data-reaction="fire"] {
+    background: rgba(255, 150, 0, 0.2);
+    border-color: rgba(255, 150, 0, 0.4);
+    color: #ff9922;
+}
+
+.reaction-btn.active[data-reaction="skull"] {
+    background: rgba(200, 200, 200, 0.2);
+    border-color: rgba(200, 200, 200, 0.4);
+    color: #cccccc;
+}
+
+@keyframes popReaction {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+.reaction-count {
+    font-size: 0.9em;
+}
+
+.post-views {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #888;
+    font-size: 0.85em;
+}
+
+.post-views i {
+    font-size: 0.9em;
+}
+
+/* ==================== */
+/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+/* ==================== */
+
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 0.8em;
+    }
+
+    .download-cards {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        top: 5px;
+        padding: 10px 15px;
+        width: 98%;
+    }
+
+    .nav-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .logo {
+        justify-content: center;
+    }
+
+    .logo-img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .logo-text {
+        font-size: 1em;
+    }
+
+    .nav-links {
+        gap: 10px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav-links a {
+        font-size: 0.75em;
+        padding: 4px 6px;
+    }
+
+    .hero {
+        padding: 120px 10px 30px;
+        min-height: auto;
+    }
+
+    .title {
+        padding: 10px;
+        letter-spacing: 1px;
+    }
+
+    .subtitle {
+        padding: 10px 15px;
+    }
+
+    .release-badge {
+        padding: 10px 18px;
+    }
+
+    .game-info {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 30px 10px;
+    }
+
+    .info-card {
+        padding: 25px 15px;
+    }
+
+    .info-card i {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .info-card h3 {
+        font-size: 1.2em;
+    }
+
+    .info-card p {
+        font-size: 0.85em;
+    }
+
+    .features-section,
+    .trailer-section,
+    .download-section,
+    .speedrunners-section {
+        padding: 40px 10px;
+    }
+
+    .section-title {
+        margin-bottom: 30px;
+        padding: 10px 20px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .feature {
+        padding: 25px 15px;
+    }
+
+    .feature-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .feature h3 {
+        font-size: 1.1em;
+    }
+
+    .feature p {
+        font-size: 0.8em;
+    }
+
+    .trailer-container {
+        min-height: 200px;
+        padding: 20px 15px;
+    }
+
+    .play-button {
+        font-size: 3em;
+    }
+
+    .speedrunners-top3 {
+        gap: 15px;
+    }
+
+    .speedrunner-card {
+        min-width: 150px;
+        padding: 20px 15px;
+    }
+
+    .speedrunner-card.gold .runner-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .runner-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .download-cards {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .download-card {
+        width: 100%;
+        max-width: 400px;
+        min-width: auto;
+    }
+
+    .card-header h3 {
+        font-size: 1.4em;
+    }
+
+    .card-body {
+        padding: 20px 15px;
+    }
+
+    .download-btn {
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+
+    .modal-content {
+        padding: 20px;
+        max-height: 85vh;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3em;
+    }
+
+    .leaderboard-row {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .leaderboard-row .row-name {
+        font-size: 0.85em;
+    }
+
+    .leaderboard-row .row-time {
+        font-size: 0.95em;
+    }
+
+    .footer {
+        margin: 30px 10px 15px;
+        padding: 20px 15px;
+    }
+
+    .footer-content p {
+        font-size: 0.75em;
+    }
+
+    .social-links a {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        top: 0;
+        border-radius: 0 0 16px 16px;
+        width: 100%;
+    }
+
+    .logo-img {
+        width: 25px;
+        height: 25px;
+    }
+
+    .logo-text {
+        font-size: 0.85em;
+    }
+
+    .nav-links {
+        gap: 6px;
+    }
+
+    .nav-links a {
+        font-size: 0.7em;
+    }
+
+    .hero {
+        padding: 110px 8px 25px;
+    }
+
+    .title {
+        font-size: clamp(1.6em, 7vw, 2.5em);
+        padding: 8px;
+    }
+
+    .subtitle {
+        font-size: 0.8em;
+        padding: 8px 12px;
+    }
+
+    .release-badge {
+        font-size: 0.75em;
+        padding: 8px 15px;
+    }
+
+    .game-info,
+    .features-grid {
+        gap: 12px;
+    }
+
+    .info-card,
+    .feature {
+        padding: 20px 12px;
+    }
+
+    .section-title {
+        font-size: clamp(1.5em, 5vw, 2em);
+    }
+
+    .trailer-container {
+        min-height: 180px;
+    }
+
+    .play-button {
+        font-size: 2.5em;
+    }
+
+    .speedrunners-top3 {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .speedrunner-card {
+        max-width: 280px;
+        width: 100%;
+    }
+
+    .download-card {
+        max-width: 100%;
+    }
+
+    .card-header {
+        padding: 20px 15px;
+    }
+
+    .card-header h3 {
+        font-size: 1.2em;
+    }
+
+    .card-body {
+        padding: 15px 12px;
+    }
+
+    .features-list li {
+        font-size: 0.8em;
+        padding: 4px 0;
+    }
+
+    .download-btn {
+        padding: 10px 12px;
+        font-size: 0.9em;
+        border-radius: 8px;
+    }
+
+    .file-size {
+        font-size: 0.7em;
+    }
+
+    .footer {
+        margin: 20px 8px 10px;
+        padding: 15px 10px;
+    }
+}
+
+================================================================================
+📊 СТАТИСТИКА:
+================================================================================
+✅ Успешно обработано: 4 файлов
+⏭️ Пропущено (пустые): 0 файлов
+🚫 Принудительно исключено: 0 файлов (structure.txt)
+❌ Ошибок чтения: 0 файлов
+📁 Всего найдено: 4 файлов
+================================================================================

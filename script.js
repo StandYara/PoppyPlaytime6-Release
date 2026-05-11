@@ -75,7 +75,7 @@ document.getElementById('releaseDownloadBtn').addEventListener('click', function
         }, 150);
 
         // Открываем Гугл Диск в новой вкладке
-        window.open('https://drive.google.com/uc?export=download&id=124KhXFwUKZcrcl2amGusdMlp1yNrCdam', '_blank');
+        window.open('https://drive.google.com/uc?export=download&id=1sC5ap-voRcGhJuoiGF0vAH_FJZLyEGDW', '_blank');
     }
 });
 
@@ -147,29 +147,29 @@ function handleNavbarScroll() {
 
 // Данные спидранеров
 const allTimeData = [
-    { rank: 1, name: 'SpeedDemon', time: '12:34', avatar: 'assets/avatar1.png' },
-    { rank: 2, name: 'Nightmare', time: '15:21', avatar: 'assets/avatar2.png' },
-    { rank: 3, name: 'GhostRunner', time: '18:07', avatar: 'assets/avatar3.png' },
-    { rank: 4, name: 'ShadowFox', time: '19:45', avatar: '' },
-    { rank: 5, name: 'TurboCat', time: '21:12', avatar: '' },
-    { rank: 6, name: 'PhantomX', time: '22:30', avatar: '' },
-    { rank: 7, name: 'DarkWolf', time: '24:08', avatar: '' },
-    { rank: 8, name: 'StormRider', time: '25:55', avatar: '' },
-    { rank: 9, name: 'BlazeFire', time: '27:40', avatar: '' },
-    { rank: 10, name: 'IceQueen', time: '29:18', avatar: '' },
+    { rank: 1, name: '-', time: '--:--', avatar: 'assets/avatar1.png' },
+    { rank: 2, name: '-', time: '--:--', avatar: 'assets/avatar2.png' },
+    { rank: 3, name: '-', time: '--:--', avatar: 'assets/avatar3.png' },
+    { rank: 4, name: '-', time: '--:--', avatar: '' },
+    { rank: 5, name: '-', time: '--:--', avatar: '' },
+    { rank: 6, name: '-', time: '--:--', avatar: '' },
+    { rank: 7, name: '-', time: '--:--', avatar: '' },
+    { rank: 8, name: '-', time: '--:--', avatar: '' },
+    { rank: 9, name: '-', time: '--:--', avatar: '' },
+    { rank: 10, name: '-', time: '--:--', avatar: '' },
 ];
 
 const monthlyData = [
-    { rank: 1, name: 'TurboCat', time: '14:20', avatar: '' },
-    { rank: 2, name: 'SpeedDemon', time: '15:10', avatar: 'assets/avatar1.png' },
-    { rank: 3, name: 'ShadowFox', time: '17:33', avatar: '' },
-    { rank: 4, name: 'Nightmare', time: '18:45', avatar: 'assets/avatar2.png' },
-    { rank: 5, name: 'BlazeFire', time: '20:10', avatar: '' },
-    { rank: 6, name: 'StormRider', time: '21:55', avatar: '' },
-    { rank: 7, name: 'PhantomX', time: '23:22', avatar: '' },
-    { rank: 8, name: 'GhostRunner', time: '24:50', avatar: 'assets/avatar3.png' },
-    { rank: 9, name: 'IceQueen', time: '26:15', avatar: '' },
-    { rank: 10, name: 'DarkWolf', time: '28:00', avatar: '' },
+    { rank: 1, name: '-', time: '--:--', avatar: '' },
+    { rank: 2, name: '-', time: '--:--', avatar: 'assets/avatar1.png' },
+    { rank: 3, name: '-', time: '--:--', avatar: '' },
+    { rank: 4, name: '-', time: '--:--', avatar: 'assets/avatar2.png' },
+    { rank: 5, name: '-', time: '--:--', avatar: '' },
+    { rank: 6, name: '-', time: '--:--', avatar: '' },
+    { rank: 7, name: '-', time: '--:--', avatar: '' },
+    { rank: 8, name: '-', time: '--:--', avatar: 'assets/avatar3.png' },
+    { rank: 9, name: '-', time: '--:--', avatar: '' },
+    { rank: 10, name: '-', time: '--:--', avatar: '' },
 ];
 
 function getRankClass(rank) {
@@ -302,7 +302,6 @@ function initUpdates() {
     localStorage.setItem('pp6_post_reactions', JSON.stringify(savedReactions));
 }
 
-// Инициализация всего
 function init() {
     createParticles();
     startCountdown();
@@ -311,6 +310,42 @@ function init() {
     handleNavbarScroll();
     initLeaderboard();
     initUpdates();
+
+    // Обработчики кнопок "Как сюда попасть"
+    const howToJoinModal = document.getElementById('howToJoinModal');
+    const howToJoinBtn = document.getElementById('howToJoinBtn');
+    const howToJoinBtnModal = document.getElementById('howToJoinBtnModal');
+    const closeHowToJoinBtn = document.getElementById('closeHowToJoinModal');
+
+    function openHowToJoin() {
+        howToJoinModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeHowToJoin() {
+        howToJoinModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (howToJoinBtn) {
+        howToJoinBtn.addEventListener('click', openHowToJoin);
+    }
+
+    if (howToJoinBtnModal) {
+        howToJoinBtnModal.addEventListener('click', openHowToJoin);
+    }
+
+    if (closeHowToJoinBtn) {
+        closeHowToJoinBtn.addEventListener('click', closeHowToJoin);
+    }
+
+    if (howToJoinModal) {
+        howToJoinModal.addEventListener('click', (e) => {
+            if (e.target === howToJoinModal) {
+                closeHowToJoin();
+            }
+        });
+    }
 
     console.log('Poppy Playtime 6 - Сайт запущен! 🎮');
     console.log('Релиз: 15 мая 2026 года');
