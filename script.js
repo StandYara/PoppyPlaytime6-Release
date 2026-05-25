@@ -75,7 +75,7 @@ document.getElementById('releaseDownloadBtn').addEventListener('click', function
         }, 150);
 
         // Открываем Гугл Диск в новой вкладке
-        window.open('https://drive.google.com/uc?export=download&id=1sC5ap-voRcGhJuoiGF0vAH_FJZLyEGDW', '_blank');
+        window.open('https://drive.google.com/uc?export=download&id=1xWzOnGiU8uzZXUZ49GyMTQ7zACdwsWcp', '_blank');
     }
 });
 
@@ -147,7 +147,7 @@ function handleNavbarScroll() {
 
 // Данные спидранеров
 const allTimeData = [
-    { rank: 1, name: '-', time: '--:--', avatar: 'assets/avatar1.png' },
+    { rank: 1, name: 'Tifaty', time: '50:49:489', avatar: 'assets/avatar1.png' },
     { rank: 2, name: '-', time: '--:--', avatar: 'assets/avatar2.png' },
     { rank: 3, name: '-', time: '--:--', avatar: 'assets/avatar3.png' },
     { rank: 4, name: '-', time: '--:--', avatar: '' },
@@ -160,7 +160,7 @@ const allTimeData = [
 ];
 
 const monthlyData = [
-    { rank: 1, name: '-', time: '--:--', avatar: '' },
+    { rank: 1, name: 'Tifaty', time: '50:49:489', avatar: '' },
     { rank: 2, name: '-', time: '--:--', avatar: 'assets/avatar1.png' },
     { rank: 3, name: '-', time: '--:--', avatar: '' },
     { rank: 4, name: '-', time: '--:--', avatar: 'assets/avatar2.png' },
