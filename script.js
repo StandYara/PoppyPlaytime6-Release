@@ -20,7 +20,7 @@ function createParticles() {
 
 // Таймер обратного отсчета
 function startCountdown() {
-    const targetDate = new Date('2026-05-15T15:00:00+03:00');
+    const targetDate = new Date('2026-07-21T17:00:00+03:00');
     const countdownElement = document.getElementById('countdown');
     const releaseButton = document.getElementById('releaseDownloadBtn');
 
@@ -65,7 +65,7 @@ document.getElementById('betaDownloadBtn').addEventListener('click', function(e)
 // Обработчик для Release кнопки
 document.getElementById('releaseDownloadBtn').addEventListener('click', function(e) {
     const now = new Date();
-    const targetDate = new Date('2026-05-15T15:00:00+03:00');
+    const targetDate = new Date('2026-07-21T17:00:00+03:00');
 
     if (now >= targetDate && !this.classList.contains('disabled')) {
         // Анимация нажатия
@@ -75,7 +75,7 @@ document.getElementById('releaseDownloadBtn').addEventListener('click', function
         }, 150);
 
         // Открываем Гугл Диск в новой вкладке
-        window.open('https://drive.google.com/uc?export=download&id=1xWzOnGiU8uzZXUZ49GyMTQ7zACdwsWcp', '_blank');
+        window.open('https://drive.google.com/uc?export=download&id=1waLYRuE1XPL3a0Q_d2qzqqSUQYTZxpiE', '_blank');
     }
 });
 
@@ -147,20 +147,20 @@ function handleNavbarScroll() {
 
 // Данные спидранеров
 const allTimeData = [
-    { rank: 1, name: 'Tifaty', time: '50:49:489', avatar: 'assets/avatar1.png' },
-    { rank: 2, name: '-', time: '--:--', avatar: 'assets/avatar2.png' },
-    { rank: 3, name: '-', time: '--:--', avatar: 'assets/avatar3.png' },
-    { rank: 4, name: '-', time: '--:--', avatar: '' },
-    { rank: 5, name: '-', time: '--:--', avatar: '' },
-    { rank: 6, name: '-', time: '--:--', avatar: '' },
-    { rank: 7, name: '-', time: '--:--', avatar: '' },
-    { rank: 8, name: '-', time: '--:--', avatar: '' },
-    { rank: 9, name: '-', time: '--:--', avatar: '' },
-    { rank: 10, name: '-', time: '--:--', avatar: '' },
+    { rank: 1, name: 'L1me', time: '24:38:125', avatar: 'assets/avatar1.png' },
+    { rank: 2, name: 'Tifaty', time: '33:49:489', avatar: 'assets/avatar2.png' },
+    { rank: 3, name: 'Mystery', time: '36:23:983', avatar: 'assets/avatar3.png' },
+    { rank: 4, name: 'Novabyte', time: '42:12:231', avatar: '' },
+    { rank: 5, name: 'Marti', time: '47:46:292', avatar: '' },
+    { rank: 6, name: 'Aster', time: '51:11:933', avatar: '' },
+    { rank: 7, name: 'Mi4el', time: '52:59:532', avatar: '' },
+    { rank: 8, name: 'Viper', time: '56:33:711', avatar: '' },
+    { rank: 9, name: 'Dusn1y', time: '60:21:227', avatar: '' },
+    { rank: 10, name: 'Unfall', time: '67:48:966', avatar: '' },
 ];
 
 const monthlyData = [
-    { rank: 1, name: 'Tifaty', time: '50:49:489', avatar: '' },
+    { rank: 1, name: '-', time: '--:--', avatar: '' },
     { rank: 2, name: '-', time: '--:--', avatar: 'assets/avatar1.png' },
     { rank: 3, name: '-', time: '--:--', avatar: '' },
     { rank: 4, name: '-', time: '--:--', avatar: 'assets/avatar2.png' },
@@ -351,10 +351,6 @@ function init() {
             }
         });
     }
-
-    console.log('Poppy Playtime 6 - Сайт запущен! 🎮');
-    console.log('Релиз: 15 мая 2026 года');
-    console.log('Осталось дней: ' + Math.ceil((new Date('2026-05-15T15:00:00+03:00') - new Date()) / (1000 * 60 * 60 * 24)));
 }
 
 // Запуск при загрузке
